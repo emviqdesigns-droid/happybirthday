@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinity Surprise for Komal ❤️</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Great+Vibes&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; font-family: 'Poppins', sans-serif; }
+        
+        /* Level 1: Scratch Layer */
+        #scratch-stage {
+            position: absolute; width: 100%; height: 100%; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 50; background: #000; transition: 1s;
+        }
+
+        /* Level 2: The Chase */
+        #game-stage { display: none; width: 100%; height: 100%; position: relative; }
+        #run-button {
+            position: absolute; padding: 15px 35px; background: #ff0055;
+            color: white; border: none; border-radius: 50px; font-weight: bold;
+            box-shadow: 0 0 25px #ff0055; cursor: pointer; transition: 0.1s;
+        }
+
+        /* Level 3: The Heart Lock (Replacing Replay) */
+        #lock-stage {
+            display: none; width: 100%; height: 100%; 
+            flex-direction: column; justify-content: center; align-items: center;
+            background: radial-gradient(circle, #2b002b, #000);
+        }
+
+        .heart-lock {
+            font-size: 80px; cursor: pointer; animation: heartbeat 1.2s infinite;
+            filter: drop-shadow(0 0 20px #ff0055);
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Final Stage: The Infinite Letter */
+        #final-letter {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 100;
+            flex-direction: column; justify-content: center; align-items: center;
+            color: white; text-align: center;
+        }
+
+        .letter-content {
+            max-width: 80%; padding: 40px; border-radius: 20px;
+            border: 2px solid #ffd700; background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(15px);
+        }
+
+        #typewriter { font-family: 'Great Vibes', cursive; font-size: 2.2rem; color: #ffd700; }
+
+        .portrait-final {
+            width: 180px; height: 180px; border-radius: 50%;
+            border: 4px solid #ffd700; object-fit: cover; margin-bottom: 20px;
+            box-shadow: 0 0 30px #ff0055;
+        }
+
+        .scratch-box { border: 4px solid gold; border-radius: 15px; position: relative; }
+        #canvas { cursor: crosshair; }
+    </style>
+</head>
+<body>
+
+    <div id="scratch-stage">
+        <h1 style="color: gold; font-family: 'Dancing Script'; font-size: 3.5rem;">Komal, Scratch My Heart...</h1>
+        <div class="scratch-box">
+            <img src="http://googleusercontent.com/profile/picture/4" style="width:300px; height:300px; object-fit:cover;">
+            <canvas id="canvas" width="300" height="300" style="position:absolute; top:0; left:0;"></canvas>
+        </div>
+    </div>
+
+    <div id="game-stage">
+        <button id="run-button" onmouseover="moveBtn()">Catch Me!</button>
+    </div>
+
+    <div id="lock-stage">
+        <h2 style="color: white; font-family: 'Dancing Script'; font-size: 2.5rem;">You found me! Now unlock the Secret...</h2>
+        <div class="heart-lock" onclick="unlockSecret()">❤️</div>
+    </div>
+
+    <div id="final-letter">
+        <div class="letter-content">
+            <img src="http://googleusercontent.com/profile/picture/5" class="portrait-final">
+            <div id="typewriter"></div>
+        </div>
+    </div>
+
+    <script>
+        // Scratch Logic
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#444'; ctx.fillRect(0,0,300,300);
+        ctx.fillStyle = '#888'; ctx.font = "25px Arial"; ctx.fillText("SCRATCH", 90, 160);
+
+        let isScratching = false;
+        function scratch(e) {
+            if(!isScratching) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath(); ctx.arc(x,y,30,0,Math.PI*2); ctx.fill();
+            checkProgress();
+        }
+        canvas.addEventListener('mousedown', () => isDrawing=true);
+        canvas.addEventListener('mousemove', (e) => { isScratching=true; scratch(e); });
+        canvas.addEventListener('mouseup', () => isScratching=false);
+
+        function checkProgress() {
+            const data = ctx.getImageData(0,0,300,300).data;
+            let clear = 0;
+            for(let i=0; i<data.length; i+=4) { if(data[i+3] === 0) clear++; }
+            if(clear > (300*300)*0.6) {
+                document.getElementById('scratch-stage').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('scratch-stage').style.display = 'none';
+                    document.getElementById('game-stage').style.display = 'block';
+                }, 1000);
+            }
+        }
+
+        // Move Button
+        let count = 0;
+        function moveBtn() {
+            const btn = document.getElementById('run-button');
+            if(count < 5) {
+                btn.style.left = Math.random() * (window.innerWidth - 150) + 'px';
+                btn.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+                count++;
+            } else {
+                btn.innerHTML = "Gotcha! Click Here";
+                btn.style.background = "#00ff88";
+                btn.onmouseover = null;
+                btn.onclick = () => {
+                    document.getElementById('game-stage').style.display = 'none';
+                    document.getElementById('lock-stage').style.display = 'flex';
+                };
+            }
+        }
+
+        // Unlock Secret
+        function unlockSecret() {
+            confetti({ particleCount: 400, spread: 150, origin: { y: 0.6 } });
+            document.getElementById('lock-stage').style.display = 'none';
+            document.getElementById('final-letter').style.display = 'flex';
+            startTyping();
+        }
+
+        // Typewriter Effect
+        const msg = "Komal, you've unlocked my heart. This isn't just a birthday wish, it's a promise that I'll always be there to make you smile, just like you made me chase this button today. You are my forever magic. Happy Birthday, Beautiful! ❤️";
+        let i = 0;
+        function startTyping() {
+            if (i < msg.length) {
+                document.getElementById('typewriter').innerHTML += msg.charAt(i);
+                i++;
+                setTimeout(startTyping, 60);
+            }
+        }
+    </script>
+</body>
+</html>
